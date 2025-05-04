@@ -63,6 +63,7 @@ static int A_nextseqnum;                /* next sequence number to use */
 static struct pkt buffer[SEQSPACE];     /* buffer for sent but unacked pkts */
 static bool buf_valid[SEQSPACE];        /* marks valid buffered slots */
 static bool buf_acked[SEQSPACE];        /* marks which buffered pkts have been ACKed */
+static int window_full;                /* for output statistics */
 
 /* called once before any other A routines are called */
 void A_init(void)
@@ -81,7 +82,7 @@ void A_output(struct msg message)
 {
   int window_count;
   int i;
-  window_count = (A_nextseqnum - A_base + SEQSPACE) % SEQSPACE
+  window_count = (A_nextseqnum - A_base + SEQSPACE) % SEQSPACE;
 
   if ( window_count < WINDOWSIZE) {
       struct pkt sendpkt;
@@ -118,7 +119,8 @@ void A_output(struct msg message)
   else {
     if (TRACE > 0)
         printf("----A: New message arrives, send window is full\n");
-  }
+      window_full++;
+    }
 
 }
 
@@ -141,7 +143,8 @@ void A_input(struct pkt packet)
           printf("----A: ACK %d is not a duplicate\n",packet.acknum);
       } 
       buf_acked[packet.acknum] = true;         /* SR: mark ACKed */
-      
+      int new_ACKs = 0;
+      new_ACKs++;
 
       while (buf_valid[A_base] && buf_acked[A_base]) {
           buf_valid[A_base] = false;
@@ -173,7 +176,9 @@ void A_timerinterrupt(void)
 {
     int count;
     int i;
-    count = (A_nextseqnum - A_base + SEQSPACE) % SEQSPACE;
+    int timer_index;
+    int packets_resent = 0;
+    count = (A_nextseqnum - A_base + SEQSPACE) % SEQSPACE
 
   if (TRACE > 0){
       printf("----A: time out,resend packets!\n");
@@ -184,6 +189,8 @@ void A_timerinterrupt(void)
     s = (A_base + i) % SEQSPACE;
     if (buf_valid[s] && !buf_acked[s]) {
         tolayer3(A, buffer[s]);
+        packets_resent++;
+        timer_index = s
         if (TRACE > 0){
             printf ("---A: resending packet %d\n", (buffer[timer_index]).seqnum);
         }
