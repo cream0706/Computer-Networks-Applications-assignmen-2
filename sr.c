@@ -114,15 +114,15 @@ void A_output(struct msg message)
 */
 void A_input(struct pkt packet)
 {  
+  int ack;
+
   /* if received ACK is not corrupted */
   if (!IsCorrupted(packet)) {
+    ack = packet.acknum;
     if (TRACE > 0)
       printf("----A: uncorrupted ACK %d is received\n",packet.acknum);
     total_ACKs_received++;
-
-    int ack;
-    ack = packet.acknum;
-
+    
     if (!acked[ack]) {
       new_ACKs++;
       acked[ack] = true;
@@ -153,8 +153,7 @@ void A_input(struct pkt packet)
 /* called when A's timer goes off */
 void A_timerinterrupt(void)
 {
-  int i;
-
+  
   if (TRACE > 0){
     printf("----A: time out,resend packets!\n");
   }
@@ -176,7 +175,7 @@ void A_init(void)
   A_nextseqnum = 0;
   base = 0;
   timer_index = -1;
-  
+
   for (i = 0; i < SEQSPACE; i++) {
     acked[i] = false;
   }
