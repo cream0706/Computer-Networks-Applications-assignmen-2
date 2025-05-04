@@ -187,9 +187,10 @@ void A_init(void)
 
 /********* Receiver (B)  variables and procedures ************/
 
-static int expectedseqnum; /* the sequence number expected next by the receiver */
-static int B_nextseqnum;   /* the sequence number for the next packets sent by B */
-
+static struct pkt recv_buffer[SEQSPACE];  /* buffer for out-of-order packets */
+static bool received[SEQSPACE];           /* whether a packet is buffered */
+static int expectedseqnum;                /* the sequence number expected next by the receiver */
+static int B_nextseqnum;                  /* the sequence number for the next packets sent by B */
 
 /* called from layer 3, when a packet arrives for layer 4 at B*/
 void B_input(struct pkt packet)
