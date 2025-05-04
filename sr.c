@@ -210,6 +210,8 @@ void B_input(struct pkt packet)
   }
 
     while (received[expectedseqnum]) {
+      if (TRACE > 0)
+        printf("B: delivering packet %d to layer5\n", expectedseqnum);
       tolayer5(B, recv_buffer[expectedseqnum].payload);
       received[expectedseqnum] = false;
       expectedseqnum = (expectedseqnum + 1) % SEQSPACE;
@@ -254,6 +256,12 @@ void B_init(void)
   
   for (i = 0; i < SEQSPACE; i++) {
     received[i] = false;
+    recv_buffer[i].seqnum = -1;
+    recv_buffer[i].acknum = -1;
+    recv_buffer[i].checksum = -1;
+    for (int j = 0; j < 20; j++) {
+      recv_buffer[i].payload[j] = 0;
+    }
   }
 }
 
