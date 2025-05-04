@@ -57,10 +57,11 @@ bool IsCorrupted(struct pkt packet)
 
 /********* Sender (A) variables and functions ************/
 
-static struct pkt buffer[WINDOWSIZE];  /* array for storing packets waiting for ACK */
-static int windowfirst, windowlast;    /* array indexes of the first/last packet awaiting ACK */
-static int windowcount;                /* the number of packets currently awaiting an ACK */
-static int A_nextseqnum;               /* the next sequence number to be used by the sender */
+static struct pkt buffer[SEQSPACE];  /* cache all sent but unacknowledged packets */
+static bool acked[SEQSPACE];         /* track whether each packet has been ACKed */
+static int base = 0;                 /* current window starting point */
+static int A_nextseqnum = 0;         /* next sequence number to be sent */
+static int timer_index = -1;         /* the current timer monitors the packet sequence number */
 
 /* called from layer 5 (application layer), passed the message to be sent to other side */
 void A_output(struct msg message)
