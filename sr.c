@@ -125,6 +125,8 @@ void A_input(struct pkt packet)
     total_ACKs_received++;
     
     if (!acked[ack]) {
+      if (TRACE > 0)
+        printf("----A: ACK %d is not a duplicate\n",packet.acknum);
       new_ACKs++;
       acked[ack] = true;
 
