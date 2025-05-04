@@ -120,7 +120,8 @@ void A_input(struct pkt packet)
       printf("----A: uncorrupted ACK %d is received\n",packet.acknum);
     total_ACKs_received++;
 
-    int ack = packet.acknum;
+    int ack;
+    ack = packet.acknum;
 
     if (!acked[ack]) {
       new_ACKs++;
@@ -178,7 +179,8 @@ void A_init(void)
   A_nextseqnum = 0;
   base = 0;
   timer_index = -1;
-  for (int i = 0; i < SEQSPACE; i++) {
+  int i;
+  for (i = 0; i < SEQSPACE; i++) {
     acked[i] = false;
   }
 }
@@ -249,7 +251,8 @@ void B_init(void)
 {
   expectedseqnum = 0;
   B_nextseqnum = 1;
-  for (int i = 0; i < SEQSPACE; i++) {
+  int i;
+  for (i = 0; i < SEQSPACE; i++) {
     received[i] = false;
   }
 }
