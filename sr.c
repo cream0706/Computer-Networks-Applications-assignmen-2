@@ -203,6 +203,9 @@ void B_input(struct pkt packet)
     if (!received[packet.seqnum]) {
       recv_buffer[packet.seqnum] = packet;
       received[packet.seqnum] = true;
+      if (TRACE > 0)
+        printf("----B: packet %d is correctly received, send ACK!\n", packet.seqnum);
+      packets_received++;
     }
 
   if (packet.seqnum == expectedseqnum && TRACE > 0) {
@@ -250,7 +253,7 @@ void B_input(struct pkt packet)
 /* entity B routines are called. You can use it to do any initialization */
 void B_init(void)
 {
-  int i;
+  int i, j;
   expectedseqnum = 0;
   B_nextseqnum = 1;
   
@@ -259,7 +262,7 @@ void B_init(void)
     recv_buffer[i].seqnum = -1;
     recv_buffer[i].acknum = -1;
     recv_buffer[i].checksum = -1;
-    for (int j = 0; j < 20; j++) {
+    for (j = 0; j < 20; j++) {
       recv_buffer[i].payload[j] = 0;
     }
   }
