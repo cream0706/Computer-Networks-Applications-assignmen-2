@@ -201,12 +201,11 @@ void B_input(struct pkt packet)
       ((packet.seqnum - expectedseqnum + SEQSPACE) % SEQSPACE < WINDOWSIZE)) {
 
     if (!received[packet.seqnum]) {
-        recv_buffer[packet.seqnum] = packet;
-        received[packet.seqnum] = true;
+      recv_buffer[packet.seqnum] = packet;
+      received[packet.seqnum] = true;
     }
 
-  if (packet.seqnum == expectedseqnum) {
-    if (TRACE > 0)
+  if (packet.seqnum == expectedseqnum && TRACE > 0) {
       printf("----B: packet %d is correctly received, send ACK!\n",packet.seqnum);
   }
 
@@ -222,15 +221,15 @@ void B_input(struct pkt packet)
     /* packet is corrupted or out of order resend last ACK */
     if (TRACE > 0)
       printf("----B: packet corrupted or not expected sequence number, resend ACK!\n");
-    if (expectedseqnum == 0)
+    
+      if (expectedseqnum == 0)
       sendpkt.acknum = SEQSPACE - 1;
     else
       sendpkt.acknum = expectedseqnum - 1;
   }
 
   /* create packet */
-  sendpkt.seqnum = B_nextseqnum;
-  B_nextseqnum = (B_nextseqnum + 1) % 2;
+  sendpkt.seqnum = 0;
 
   /* we don't have any data to send.  fill payload with 0's */
   for ( i=0; i<20 ; i++ )
@@ -247,9 +246,10 @@ void B_input(struct pkt packet)
 /* entity B routines are called. You can use it to do any initialization */
 void B_init(void)
 {
+  int i;
   expectedseqnum = 0;
   B_nextseqnum = 1;
-  int i;
+  
   for (i = 0; i < SEQSPACE; i++) {
     received[i] = false;
   }
