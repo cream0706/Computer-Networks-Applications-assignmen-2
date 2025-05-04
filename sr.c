@@ -199,14 +199,16 @@ void B_input(struct pkt packet)
   /* if not corrupted and received packet is in order */
   if (!IsCorrupted(packet) &&
       ((packet.seqnum - expectedseqnum + SEQSPACE) % SEQSPACE < WINDOWSIZE)) {
-    if (TRACE > 0)
-      printf("----B: packet %d is correctly received, send ACK!\n",packet.seqnum);
-    packets_received++;
 
     if (!received[packet.seqnum]) {
-      recv_buffer[packet.seqnum] = packet;
-      received[packet.seqnum] = true;
+        recv_buffer[packet.seqnum] = packet;
+        received[packet.seqnum] = true;
     }
+
+  if (packet.seqnum == expectedseqnum) {
+    if (TRACE > 0)
+      printf("----B: packet %d is correctly received, send ACK!\n",packet.seqnum);
+  }
 
     while (received[expectedseqnum]) {
       tolayer5(B, recv_buffer[expectedseqnum].payload);
