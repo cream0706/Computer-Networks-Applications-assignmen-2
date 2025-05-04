@@ -71,10 +71,10 @@ void A_output(struct msg message)
 
   /* if not blocked waiting on ACK */
   if ( (A_nextseqnum + SEQSPACE - base) % SEQSPACE < WINDOWSIZE) {
-  /*
+ 
     if (TRACE > 1)
       printf("----A: New message arrives, send window is not full, send new messge to layer3!\n");
-  */
+
     /* create packet */
     sendpkt.seqnum = A_nextseqnum;
     sendpkt.acknum = NOTINUSE;
@@ -89,7 +89,7 @@ void A_output(struct msg message)
 
     /* send out packet */
     if (TRACE > 0)
-      printf("----A: Sending packet %d to layer 3\n", sendpkt.seqnum);
+      printf("Sending packet %d to layer 3\n", sendpkt.seqnum);
     tolayer3 (A, sendpkt);
 
     /* start timer if first packet in window */
@@ -156,10 +156,10 @@ void A_timerinterrupt(void)
 {
   
   if (TRACE > 0){
-    printf("----A: timeout, resend packets %d\n", buffer[timer_index].seqnum);
+    printf("----A: time out,resend packets!\n");
   }
     if (timer_index != -1 && !acked[timer_index]) {
-      printf ("----A: resending packet %d\n", (buffer[timer_index]).seqnum);
+      printf ("---A: resending packet %d\n", (buffer[timer_index]).seqnum);
       tolayer3(A,buffer[timer_index]);
       packets_resent++;
       starttimer(A,RTT);
