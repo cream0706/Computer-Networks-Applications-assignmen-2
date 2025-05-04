@@ -157,7 +157,8 @@ void A_timerinterrupt(void)
   if (TRACE > 0)
     printf("----A: time out,resend packets!\n");
 
-  for(i=0; i<windowcount; i++) {
+    if (timer_index != -1 && !acked[timer_index]) {
+      tolayer3(A, buffer[timer_index]);
 
     if (TRACE > 0)
       printf ("---A: resending packet %d\n", (buffer[(windowfirst+i) % WINDOWSIZE]).seqnum);
@@ -165,7 +166,7 @@ void A_timerinterrupt(void)
     tolayer3(A,buffer[(windowfirst+i) % WINDOWSIZE]);
     packets_resent++;
     if (i==0) starttimer(A,RTT);
-  }
+    }
 }
 
 
@@ -174,14 +175,12 @@ void A_timerinterrupt(void)
 /* entity A routines are called. You can use it to do any initialization */
 void A_init(void)
 {
-  /* initialise A's window, buffer and sequence number */
-  A_nextseqnum = 0;  /* A starts with seq num 0, do not change this */
-  windowfirst = 0;
-  windowlast = -1;   /* windowlast is where the last packet sent is stored.
-		     new packets are placed in winlast + 1
-		     so initially this is set to -1
-		   */
-  windowcount = 0;
+  A_nextseqnum = 0;
+  base = 0;
+  timer_index = -1;
+  for (int i = 0; i < SEQSPACE; i++) {
+    acked[i] = false;
+  }
 }
 
 
